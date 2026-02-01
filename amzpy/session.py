@@ -24,7 +24,7 @@ DEFAULT_CONFIG = {
     'MAX_RETRIES': 3,
     'REQUEST_TIMEOUT': 25,
     'DELAY_BETWEEN_REQUESTS': (2, 5),
-    'DEFAULT_IMPERSONATE': 'chrome119'  # part of curl_cffi's impersonation
+    'DEFAULT_IMPERSONATE': 'chrome120'  # part of curl_cffi's impersonation
 }
 
 # Default header template
@@ -32,7 +32,7 @@ DEFAULT_HEADERS = {
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
     'Accept-Language': 'en-US,en;q=0.9',
     'Upgrade-Insecure-Requests': '1',
-    'Sec-Ch-Ua': '"Google Chrome";v="119", "Chromium";v="119", "Not?A_Brand";v="24"',
+    'Sec-Ch-Ua': '"Not_A Brand";v="8", "Chromium";v="120", "Google Chrome";v="120"',
     'Sec-Ch-Ua-Mobile': '?0',
     'Sec-Ch-Ua-Platform': '"Windows"',
     'Sec-Fetch-Dest': 'document',
@@ -83,9 +83,8 @@ class AmzSession:
         if config:
             self.config.update(config)
         
-        # Initialize fake_useragent with common browser and OS combinations
-        self.ua_generator = UserAgent(browsers=['Chrome', 'Edge', 'Safari'], 
-                                     os=['Windows', 'MacOS', 'Linux'])
+        # Initialize fake_useragent restricted to Chrome to match impersonation
+        self.ua_generator = UserAgent(browsers=['Chrome'], os=['Windows', 'MacOS'])
         
         # Create curl_cffi session
         self.session = curl_cffi.requests.Session()
