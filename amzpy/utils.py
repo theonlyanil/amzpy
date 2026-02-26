@@ -11,31 +11,53 @@ def parse_amazon_url(url: str) -> Optional[Tuple[str, str]]:
     Returns:
         Tuple[str, str]: (base_url, product_id) if valid
         None: If URL is invalid
-        
-    Examples:
-        >>> parse_amazon_url("https://www.amazon.com/dp/B0D4J2QDVY")
-        ("https://www.amazon.com/", "B0D4J2QDVY")
-        >>> parse_amazon_url("https://www.amazon.in/product-name/dp/B0D4J2QDVY/ref=...")
-        ("https://www.amazon.in/", "B0D4J2QDVY")
     """
     # Clean up the URL
     url = url.strip()
     
-    # Match Amazon domain and product ID
-    pattern = r'https?://(?:www\.)?amazon\.([a-z.]+)(?:/[^/]+)*?/(?:dp|gp/product)/([A-Z0-9]{10})'
-    match = re.search(pattern, url)
-    
-    if not match:
+    # Match Amazon domain
+    domain_match = re.search(r'https?://(?:www\.)?amazon\.([a-z.]+)', url)
+    if not domain_match:
         return None
         
-    # Extract domain and construct base URL
-    domain = match.group(1)
+    domain = domain_match.group(1)
     base_url = f"https://www.amazon.{domain}/"
     
     # Extract product ID
-    product_id = match.group(2)
+    product_id = extract_asin(url)
     
-    return base_url, product_id 
+    if not product_id:
+        return None
+        
+    return base_url, product_id
+
+def extract_asin(url: str) -> Optional[str]:
+    """
+    Extract ASIN (Amazon Standard Identification Number) from any Amazon URL.
+    Handles various formats: /dp/, /gp/product/, /gp/aw/d/, etc.
+    
+    Args:
+        url (str): Amazon URL (full or relative)
+        
+    Returns:
+        str: 10-character ASIN if found, None otherwise
+    """
+    if not url:
+        return None
+        
+    # Common Amazon URL patterns for product IDs
+    patterns = [
+        r'/(?:dp|gp/product|gp/aw/d|aw/d|product|gp/d)/([A-Z0-9]{10})',
+        r'asin=([A-Z0-9]{10})',
+        r'/([A-Z0-9]{10})(?:/|\?|$)' # Last resort: 10-char alphanumeric after a slash
+    ]
+    
+    for pattern in patterns:
+        match = re.search(pattern, url)
+        if match:
+            return match.group(1)
+            
+    return None
 
 def format_canonical_url(url: str, asin: str, country_code: str = None) -> str:
     """

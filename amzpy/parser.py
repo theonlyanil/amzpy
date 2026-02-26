@@ -20,7 +20,7 @@ from typing import Dict, Optional, TYPE_CHECKING, Any, List, Tuple
 if TYPE_CHECKING:
     from amzpy.session import AmzSession
 
-from amzpy.utils import extract_brand_name, format_canonical_url
+from amzpy.utils import extract_brand_name, format_canonical_url, parse_amazon_url, extract_asin
 
 
 def parse_product_page(html_content: str, url: str = None, country_code: str = None) -> Optional[Dict]:
@@ -139,9 +139,7 @@ def parse_product_page(html_content: str, url: str = None, country_code: str = N
         # Extract ASIN (Amazon Standard Identification Number)
         asin = None
         if url:
-            asin_match = re.search(r'/dp/([A-Z0-9]{10})', url)
-            if asin_match:
-                asin = asin_match.group(1)
+            asin = extract_asin(url)
                 
         # Extract ratings if available
         rating = None
@@ -489,9 +487,7 @@ def parse_search_page(html_content: str, base_url: str = None, country_code: str
                             
                             # Try to extract ASIN from URL
                             if color_url:
-                                asin_match = re.search(r'/dp/([A-Z0-9]{10})', color_url)
-                                if asin_match:
-                                    color_asin = asin_match.group(1)
+                                color_asin = extract_asin(color_url)
                                 
                             if color_name:
                                 if color_url.startswith('/'):
