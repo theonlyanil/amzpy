@@ -507,7 +507,11 @@ def parse_search_page(html_content: str, base_url: str = None, country_code: str
                 
                 # Extract "Amazon's Choice" or "Best Seller" badges
                 badge_text = None
-                badge_element = container.select_one('.a-badge-text') or container.select_one('[aria-label*="Choice"]')
+                badge_element = (
+                    container.select_one('.a-badge-text') or 
+                    container.select_one('.s-badge-text') or 
+                    container.select_one('.a-badge-label')
+                )
                 if badge_element:
                     badge_text = badge_element.text.strip()
                     if not badge_text and badge_element.get('aria-label'):

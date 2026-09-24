@@ -11,7 +11,7 @@ Basic usage:
     >>> details = scraper.get_product_details("https://www.amazon.com/dp/B0D4J2QDVY")
     >>> print(details)
 
-:copyright: (c) 2025 by Anil Sardiwal.
+:copyright: (c) 2026 by Anil Sardiwal.
 :license: MIT, see LICENSE for more details.
 """
 

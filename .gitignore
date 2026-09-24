@@ -141,3 +141,6 @@ Thumbs.db
 product_*.json
 scraped_*.json
 test_user_url.py
+.gemini/
+.aider*
+.cursor*

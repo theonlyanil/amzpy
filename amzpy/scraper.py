@@ -39,7 +39,7 @@ class AmazonScraper:
         user_config (dict): User configuration parameters
     """
 
-    def __init__(self, country_code: str = "com", impersonate: str = None, proxies: Optional[Dict] = None):
+    def __init__(self, country_code: str = "com", impersonate: str = None, proxies: Optional[Dict] = None, **kwargs):
         """
         Initialize the Amazon scraper with the specified configuration.
         
@@ -47,13 +47,29 @@ class AmazonScraper:
             country_code (str): Amazon domain country code (e.g. "com", "in")
             impersonate (str, optional): Browser to impersonate (e.g. "chrome119")
             proxies (Dict, optional): Proxy configuration for requests
+            **kwargs: Additional configuration options (e.g. retries, delay, MAX_RETRIES, etc.)
         """
         self.country_code = country_code
         self.user_config = DEFAULT_CONFIG.copy()
+        
+        # Handle legacy/convenience parameter names
+        if 'retries' in kwargs:
+            self.user_config['MAX_RETRIES'] = kwargs.pop('retries')
+        if 'delay' in kwargs:
+            delay_val = kwargs.pop('delay')
+            if isinstance(delay_val, (int, float)):
+                self.user_config['DELAY_BETWEEN_REQUESTS'] = (delay_val, delay_val * 2)
+            else:
+                self.user_config['DELAY_BETWEEN_REQUESTS'] = delay_val
+                
+        if kwargs:
+            self.user_config.update(kwargs)
+
         self.session = AmzSession(
             country_code=country_code,
             impersonate=impersonate,
-            proxies=proxies
+            proxies=proxies,
+            config=self.user_config
         )
         
         print(f"AmazonScraper initialized for amazon.{country_code}")
